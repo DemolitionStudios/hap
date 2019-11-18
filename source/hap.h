@@ -46,7 +46,9 @@ enum HapTextureFormat {
 
 enum HapCompressor {
     HapCompressorNone,
-    HapCompressorSnappy
+    HapCompressorSnappy,
+    HapCompressorLZ4,
+    HapCompressorLZ4fast
 };
 
 enum HapResult {

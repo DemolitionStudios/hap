@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include <string.h> // For memcpy for uncompressed frames
 #include "snappy-c.h"
+#include "lz4.h"
 
 #define kHapUInt24Max 0x00FFFFFF
 
@@ -41,6 +42,8 @@
 #define kHapCompressorNone 0xA
 #define kHapCompressorSnappy 0xB
 #define kHapCompressorComplex 0xC
+#define kHapCompressorLZ4 0xD
+#define kHapCompressorLZ4fast 0xE
 
 #define kHapFormatRGBDXT1 0xB
 #define kHapFormatRGBADXT5 0xE
@@ -801,6 +804,13 @@ unsigned int hap_decode_single_texture(const void *texture_section, uint32_t tex
                         break;
                     }
                 }
+                else if (chunk_info[i].compressor == kHapCompressorLZ4 || 
+                         chunk_info[i].compressor == kHapCompressorLZ4fast)
+                {
+                    // No snappy_uncompressed_length equivalent in lz4
+                    chunk_info[i].uncompressed_chunk_size = 0;
+                    // FIXME: get from Chunk header (stored by ffmpeg)
+                }
                 else
                 {
                     chunk_info[i].uncompressed_chunk_size = chunk_info[i].compressed_chunk_size;
@@ -808,6 +818,13 @@ unsigned int hap_decode_single_texture(const void *texture_section, uint32_t tex
 
                 chunk_info[i].uncompressed_chunk_data = (char *)(((uint8_t *)outputBuffer) + running_uncompressed_chunk_size);
                 running_uncompressed_chunk_size += chunk_info[i].uncompressed_chunk_size;
+            }
+
+            if (chunk_info[i].compressor == kHapCompressorLZ4 ||
+                chunk_info[i].compressor == kHapCompressorLZ4fast)
+            {
+                // No snappy_uncompressed_length equivalent in lz4
+                //running_uncompressed_chunk_size = 
             }
 
             if (result == HapResult_No_Error && running_uncompressed_chunk_size > outputBufferBytes)
@@ -872,6 +889,16 @@ unsigned int hap_decode_single_texture(const void *texture_section, uint32_t tex
         snappy_result = snappy_uncompress((const char *)texture_section, texture_section_length, (char *)outputBuffer, &bytesUsed);
         if (snappy_result != SNAPPY_OK)
         {
+            return HapResult_Internal_Error;
+        }
+    }
+    else if (compressor == kHapCompressorLZ4 || compressor == kHapCompressorLZ4fast)
+    {
+        int lz4_result = LZ4_decompress_safe((const char*)texture_section, (char*)outputBuffer,
+                                             texture_section_length, outputBufferBytes);
+        if (lz4_result <= 0)
+        {
+            // TODO: or HapResult_Buffer_Too_Small
             return HapResult_Internal_Error;
         }
     }
