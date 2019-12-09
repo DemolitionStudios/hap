@@ -49,7 +49,12 @@ enum HapCompressor {
     HapCompressorNone,
     HapCompressorSnappy,
     HapCompressorLZ4,
-    HapCompressorLZ4fast
+    HapCompressorLZ4fast3,
+    HapCompressorLZ4fast17,
+    HapCompressorLZ4hc4,
+    HapCompressorLizard10,
+    HapCompressorLizard12,
+    HapCompressorZSTD,
 };
 
 enum HapResult {
