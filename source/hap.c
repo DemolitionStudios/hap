@@ -625,59 +625,59 @@ static void hap_decode_chunk(HapChunkDecodeInfo chunks[], unsigned int index)
                     break;
             }
         }
-		else if (chunks[index].compressor >= kHapCompressorLZ4 && 
-			     chunks[index].compressor <= kHapCompressorLZ4hc4)
-		{
-			int lz4_result = LZ4_decompress_safe(chunks[index].compressed_chunk_data, chunks[index].uncompressed_chunk_data,
-												 chunks[index].compressed_chunk_size, chunks[index].uncompressed_chunk_size);
-			if (lz4_result <= 0)
-			{
-				chunks[index].result = HapResult_Bad_Frame;
-			}
-			else if (lz4_result != chunks[index].uncompressed_chunk_size)
-			{
-				chunks[index].result = HapResult_Bad_Frame;
-			}
-			else
-			{
-				chunks[index].result = HapResult_No_Error;
-			}
-		}
-		else if (chunks[index].compressor == kHapCompressorLizard10 ||
-				 chunks[index].compressor == kHapCompressorLizard12)
-		{
-			int lizard_result = Lizard_decompress_safe(chunks[index].compressed_chunk_data, chunks[index].uncompressed_chunk_data,
-													   chunks[index].compressed_chunk_size, chunks[index].uncompressed_chunk_size);
-			if (lizard_result <= 0)
-			{
-				chunks[index].result = HapResult_Bad_Frame;
-			}
-			else if (lizard_result != chunks[index].uncompressed_chunk_size)
-			{
-				chunks[index].result = HapResult_Bad_Frame;
-			}
-			else
-			{
-				chunks[index].result = HapResult_No_Error;
-			}
-		}
-		else if (chunks[index].compressor == kHapCompressorZSTD)
-		{
-			int zstd_result = ZSTD_decompress(chunks[index].uncompressed_chunk_data, chunks[index].uncompressed_chunk_size,
-											  chunks[index].compressed_chunk_data, chunks[index].compressed_chunk_size);
-			if (ZSTD_isError(zstd_result))
-			{
-				chunks[index].result = HapResult_Bad_Frame;
-			}
-			else if (zstd_result != chunks[index].uncompressed_chunk_size)
-			{
-				chunks[index].result = HapResult_Bad_Frame;
-			}
-			else
-			{
-				chunks[index].result = HapResult_No_Error;
-			}
-		}
+        else if (chunks[index].compressor >= kHapCompressorLZ4 &&
+            chunks[index].compressor <= kHapCompressorLZ4hc4)
+        {
+            int lz4_result = LZ4_decompress_safe(chunks[index].compressed_chunk_data, chunks[index].uncompressed_chunk_data,
+                chunks[index].compressed_chunk_size, chunks[index].uncompressed_chunk_size);
+            if (lz4_result <= 0)
+            {
+                chunks[index].result = HapResult_Bad_Frame;
+            }
+            else if (lz4_result != chunks[index].uncompressed_chunk_size)
+            {
+                chunks[index].result = HapResult_Bad_Frame;
+            }
+            else
+            {
+                chunks[index].result = HapResult_No_Error;
+            }
+        }
+        else if (chunks[index].compressor == kHapCompressorLizard10 ||
+            chunks[index].compressor == kHapCompressorLizard12)
+        {
+            int lizard_result = Lizard_decompress_safe(chunks[index].compressed_chunk_data, chunks[index].uncompressed_chunk_data,
+                chunks[index].compressed_chunk_size, chunks[index].uncompressed_chunk_size);
+            if (lizard_result <= 0)
+            {
+                chunks[index].result = HapResult_Bad_Frame;
+            }
+            else if (lizard_result != chunks[index].uncompressed_chunk_size)
+            {
+                chunks[index].result = HapResult_Bad_Frame;
+            }
+            else
+            {
+                chunks[index].result = HapResult_No_Error;
+            }
+        }
+        else if (chunks[index].compressor == kHapCompressorZSTD)
+        {
+            int zstd_result = ZSTD_decompress(chunks[index].uncompressed_chunk_data, chunks[index].uncompressed_chunk_size,
+                chunks[index].compressed_chunk_data, chunks[index].compressed_chunk_size);
+            if (ZSTD_isError(zstd_result))
+            {
+                chunks[index].result = HapResult_Bad_Frame;
+            }
+            else if (zstd_result != chunks[index].uncompressed_chunk_size)
+            {
+                chunks[index].result = HapResult_Bad_Frame;
+            }
+            else
+            {
+                chunks[index].result = HapResult_No_Error;
+            }
+        }
         else if (chunks[index].compressor == kHapCompressorNone)
         {
             memcpy(chunks[index].uncompressed_chunk_data,
@@ -693,12 +693,11 @@ static void hap_decode_chunk(HapChunkDecodeInfo chunks[], unsigned int index)
 }
 
 static unsigned int hap_decode_header_complex_instructions(
-	void *texture_section, uint32_t texture_section_length, int * chunk_count,
-	const void **compressors, const void **chunk_sizes, const void **chunk_offsets, 
-	const void **chunk_uncompressed_sizes, const char **frame_data)
+    void *texture_section, uint32_t texture_section_length, int * chunk_count,
+    const void **compressors, const void **chunk_sizes, const void **chunk_offsets, 
+    const void **chunk_uncompressed_sizes, const char **frame_data)
 {
-    
-	int result = HapResult_No_Error;
+    int result = HapResult_No_Error;
     const void *section_start;
     uint32_t section_header_length;
     uint32_t section_length;
@@ -708,7 +707,7 @@ static unsigned int hap_decode_header_complex_instructions(
     *compressors = NULL;
     *chunk_sizes = NULL;
     *chunk_offsets = NULL;
-	*chunk_uncompressed_sizes = NULL;
+    *chunk_uncompressed_sizes = NULL;
 
     result = hap_read_section_header(texture_section, texture_section_length, &section_header_length, &section_length, &section_type);
 
@@ -754,10 +753,10 @@ static unsigned int hap_decode_header_complex_instructions(
                 *chunk_offsets = section_start;
                 section_chunk_count = section_length / 4;
                 break;
-			case kHapSectionChunkUncompressedSizeTable:
-				*chunk_uncompressed_sizes = section_start;
-				section_chunk_count = section_length / 4;
-				break;
+            case kHapSectionChunkUncompressedSizeTable:
+                *chunk_uncompressed_sizes = section_start;
+                section_chunk_count = section_length / 4;
+                break;
             default:
                 // Ignore unrecognized sections
                 break;
@@ -826,11 +825,11 @@ unsigned int hap_decode_single_texture(const void *texture_section, uint32_t tex
         const void *compressors = NULL;
         const void *chunk_sizes = NULL;
         const void *chunk_offsets = NULL;
-		const void *chunk_uncompressed_sizes = NULL;
+        const void *chunk_uncompressed_sizes = NULL;
         const char *frame_data = NULL;
 
         result = hap_decode_header_complex_instructions(texture_section, texture_section_length, &chunk_count, &compressors,
-														&chunk_sizes, &chunk_offsets, &chunk_uncompressed_sizes, &frame_data);
+                                                        &chunk_sizes, &chunk_offsets, &chunk_uncompressed_sizes, &frame_data);
 
         if (result != HapResult_No_Error)
         {
@@ -890,11 +889,11 @@ unsigned int hap_decode_single_texture(const void *texture_section, uint32_t tex
                         break;
                     }
                 }
-                else if (chunk_info[i].compressor >= kHapCompressorLZ4 && 
+                else if (chunk_info[i].compressor >= kHapCompressorLZ4 &&
                          chunk_info[i].compressor <= kHapCompressorZSTD)
                 {
-					// TODO: use it for snappy to for consistency
                     // No snappy_uncompressed_length equivalent in lz4/lizard/zstd: get directly from the chunk header (written by ffmpeg)
+                    // TODO: use stored uncompressed chunk size for snappy also for consistency
                     chunk_info[i].uncompressed_chunk_size = hap_read_4_byte_uint(((uint8_t*)chunk_uncompressed_sizes) + (i * 4));
                 }
                 else
@@ -981,26 +980,26 @@ unsigned int hap_decode_single_texture(const void *texture_section, uint32_t tex
             return HapResult_Internal_Error;
         }
     }
-	else if (compressor == kHapCompressorLizard10 || compressor == kHapCompressorLizard12)
-	{
-		int lizard_result = Lizard_decompress_safe((const char*)texture_section, (char*)outputBuffer,
-													texture_section_length, outputBufferBytes);
-		if (lizard_result <= 0)
-		{
-			// TODO: or HapResult_Buffer_Too_Small
-			return HapResult_Internal_Error;
-		}
-	}
-	else if (compressor == kHapCompressorZSTD)
-	{
-		int zstd_result = ZSTD_decompress((char*)outputBuffer, outputBufferBytes, 
-										  (const char*)texture_section, texture_section_length);
-		if (ZSTD_isError(zstd_result))
-		{
-			// TODO: or HapResult_Buffer_Too_Small
-			return HapResult_Internal_Error;
-		}
-	}
+    else if (compressor == kHapCompressorLizard10 || compressor == kHapCompressorLizard12)
+    {
+        int lizard_result = Lizard_decompress_safe((const char*)texture_section, (char*)outputBuffer,
+                                                    texture_section_length, outputBufferBytes);
+        if (lizard_result <= 0)
+        {
+            // TODO: or HapResult_Buffer_Too_Small
+            return HapResult_Internal_Error;
+        }
+    }
+    else if (compressor == kHapCompressorZSTD)
+    {
+        int zstd_result = ZSTD_decompress((char*)outputBuffer, outputBufferBytes, 
+                                          (const char*)texture_section, texture_section_length);
+        if (ZSTD_isError(zstd_result))
+        {
+            // TODO: or HapResult_Buffer_Too_Small
+            return HapResult_Internal_Error;
+        }
+    }
     else if (compressor == kHapCompressorNone)
     {
         /*
@@ -1265,7 +1264,7 @@ unsigned int HapGetFrameTextureChunkCount(const void *inputBuffer, unsigned long
             const void *compressors = NULL;
             const void *chunk_sizes = NULL;
             const void *chunk_offsets = NULL;
-			const void* chunk_uncompressed_sizes = NULL;
+            const void *chunk_uncompressed_sizes = NULL;
             const char *frame_data = NULL;
 
             result = hap_decode_header_complex_instructions(section, section_length, chunk_count, &compressors, &chunk_sizes, &chunk_offsets, &chunk_uncompressed_sizes, &frame_data);
