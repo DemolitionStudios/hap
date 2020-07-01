@@ -37,6 +37,7 @@ extern "C" {
  GL_ARB_texture_compression_rgtc and GL_ARB_texture_compression_bptc
  */
 
+
 enum HapTextureFormat {
     HapTextureFormat_RGB_DXT1 = 0x83F0,
     HapTextureFormat_RGBA_DXT5 = 0x83F3,
